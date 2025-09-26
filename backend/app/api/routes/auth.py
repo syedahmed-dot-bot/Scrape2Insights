@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Depends 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
@@ -34,6 +34,13 @@ def get_current_user(token: str = Depends(oauth2_schema), db: Session = Depends(
         raise credentials_exception
     return UserOut.model_validate(user)
 
+def require_role(required: str):
+    def checker(current_user: UserOut = Depends(get_current_user)) -> UserOut:
+        if current_user.role != required:
+            raise HTTPException(status_code=403, detail="Forbidden")
+        return current_user
+    return checker
+ 
 @router.post("/signup", response_model = UserOut, status_code=201)
 def signup(body: UserCreate, db: Session = Depends(get_db)):
     existing = get_user_by_email(db, body.email)

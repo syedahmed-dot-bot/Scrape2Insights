@@ -2,10 +2,12 @@ from fastapi import FastAPI
 from .api.routes.health import router as health_router
 from .core.config import settings
 from .api.routes.auth import router as auth_router
+from .api.routes.admin import router as admin_router
 
 app = FastAPI(title = settings.APP_NAME, version = "0.1.0")
 app.include_router(health_router, prefix="/health", tags=["health"])
 app.include_router(auth_router, prefix="/auth", tags = ["auth"])
+app.include_router(admin_router, prefix = "/admin", tags = ["admin"])
 
 @app.get("/")
 def root():
